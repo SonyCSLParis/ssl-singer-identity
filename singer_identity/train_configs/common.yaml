@@ -7,11 +7,10 @@ data:
     dataset_dirs: 
       # - 'PLACE PATH TO DATASET HERE'
       # - 'PLACE PATH TO OTHER DATASET HERE IF NEEDED'
-      - "/home/bernardo/Projects/Datasets/vocalset/val"
 
 # ------------------ Data loading hyperparameters ------------------       
-    batch_size: 8  # TODO CHANGE BACK TO 140
-    batch_size_val:  8
+    batch_size: 140
+    batch_size_val:  140
     nr_samples: 176000  # 4s in 44.1kHz
     normalize: true
     num_workers: 4
