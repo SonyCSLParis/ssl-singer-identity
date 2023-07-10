@@ -1,14 +1,9 @@
 Singer Identity Representation Learning using Self-Supervised Techniques
 ==============================
 
-Learning representations of singing voice using self-supervised learning
+This repository contains the code and models of the paper: [Singer Identity Representation Learning using Self-Supervised Techniques](link_to_the_paper). You can find additional visualizations of the singer embeddings and supplementary material [here](https://sites.google.com/view/singer-representation-learning).
 
-
-# Singer identity representations
-
-This repository contains the code and models of the paper: [Singer Identity Representation Learning using Self-Supervised Techniques](link_to_the_paper). You can find additional visualizations and supplementary material [here](https://sites.google.com/view/singer-representation-learning).
-
-Bernardo Torres, Stefan Lattner and Gaël Richard
+*Bernardo Torres, Stefan Lattner and Gaël Richard*
 
 TODO 
 - improve these images (or remove them completely)
@@ -26,7 +21,15 @@ TODO
 
 ## Training <a name="training"></a>
 
-We provide the code to train a simple model on the following SSL tasks: SimCLR/COLA[1,2], Uniformity-Alignment[3], VicReg[4], BYOL[5]. The default backbone is the EfficientNet-B0 [6], with simple average pooling as temporal aggregation. 
+We provide the code to train a simple model on the following SSL tasks: 
+
+- Contrastive Learning [1,2]
+- Uniformity-Alignment [3]
+- VICReg [4]
+- BYOL [5]
+
+
+The default backbone is the EfficientNet-B0 [6], with average pooling as temporal aggregation. 
 
 Our training script uses [PyTorch Lightning](https://www.pytorchlightning.ai/) and [Lightning CLI](https://lightning.ai/docs/pytorch/stable/cli/lightning_cli.html#lightning-cli). To train a model, use the `train.py` script as follows:
 
@@ -78,6 +81,7 @@ Replace `class_path` field in the config file to use different a different logge
 - [Soundfile](https://pypi.org/project/soundfile/) for audio loading
 - [Parselmouth](https://github.com/YannickJadoul/Parselmouth) for pitch shifting
 
+You can use the provided `environment.yml` file to create a conda environment with the required dependencies.
 
 ## Pretrained Models <a name="pretrained-models"></a>
 
@@ -85,10 +89,16 @@ You can download and load the pretrained models using the following command:
 
 ```python
 from singer_identity import load_model
-model = load_model(model_path)
+model = load_model(model_name)
 ```
 This will load the model using HuggingFace Hub.
-You can also use `load_model(model_path, torchscript=True)` to load a [scripted](https://pytorch.org/tutorials/beginner/Intro_to_TorchScript_tutorial.html) version of the model, or manually specify the model path using `load_model(model_path, source=/path/to/modelfolder)`. 
+You can also use `load_model(model_name, torchscript=True)` to load a [scripted](https://pytorch.org/tutorials/beginner/Intro_to_TorchScript_tutorial.html) version of the model.
+
+To manually specify the model (eg for testing trained/finetuned models), make sure to place the model file in a folder with the corresponding `hyperparams.yaml`: 
+
+```python 
+load_model(model_filename.pt, source=/path/to/model/folder)
+```
 
 If using a sample rate different than 44.1kHz, you can specify it using `input_sr`, eg. `load_model(model_path, input_sr=16000)` (note that this will upsample the audio to 44.1kHz before computing the embeddings, which is not what the model was trained on).
 
@@ -150,11 +160,17 @@ Steps to preprocess the data for evaluation:
         │   └── ... 
     ```
 
-4. You can compute speaker pairs for EER using the `preprocess/compute_speaker_pairs.py` script (or use the ones provided in the metadata folder and [here (VocalSet)](metadata/vocalset_renamed_split_4s/speaker_pairs.txt)  [here (M4singer)](metadata/m4singer_renamed_split_4s/speaker_pairs.txt) 
+4. You can compute speaker pairs for EER using the `preprocess/compute_speaker_pairs.py` script (or use the ones provided in the metadata folder and [here (VocalSet)](metadata/vocalset_renamed_split_4s/speaker_pairs.txt)  [here (M4singer)](metadata/m4singer_renamed_split_4s/speaker_pairs.txt) )
+
+Example:
+
+```bash
+python create_speaker_pairs.py -r /path/to/dataset -o /where/sample_pairs/will/be/saved -n n_singers -p n_draws
+```
 
 #### Singer similarity evaluation <a name="evaluation"></a>
 
-Our evaluation includes two modes: similarity and identification. First, computing speaker trial pairs is needed (see above). They are stored in a metadata folder, (eg. metadata/vocalset/speaker_pairs.txt, metadata/vctk/speaker_pairs.txt). The EER computation follows the one available on [SUPERB](https://github.com/s3prl/s3prl/tree/main/s3prl).
+ First, computing speaker trial pairs is needed (see above). They are stored in a metadata folder, (eg. metadata/vocalset/speaker_pairs.txt, metadata/vctk/speaker_pairs.txt). The EER computation follows the one available on [SUPERB](https://github.com/s3prl/s3prl/tree/main/s3prl). 
 
 ```bash
 python eval.py -s seed -r root -d data -m model -meta metadata -f use_features -cr compute_rank -ce compute_eer -bs batch_size
@@ -181,6 +197,9 @@ Example:
 ```python
 python eval.py -s 123 -r /data/datasets -d vocalset -m byol_model -meta test_scores/metadata -f True -cr True -ce True -bs 128
 ```
+
+If you want to evaluate your own models simply override the `load_id_extractor(model_file, source)` method of the `eval.py`.
+
 #### Singer identification evaluation <a name="evaluation"></a>
 
 - To train singer identification linear classifiers:

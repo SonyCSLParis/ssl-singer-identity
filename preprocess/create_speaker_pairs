@@ -157,7 +157,7 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
     random.seed(args.seed)
-
+    # Example: python create_speaker_pairs.py -r /path/to/dataset -o /where/sample_pairs/will/be/saved -n n_singers -p n_draws
     dataset_dir = Path(args.root)
     dataset_name = dataset_dir.name
     metadata_path = Path(args.output_dir) / "metadata" / dataset_name

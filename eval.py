@@ -1,4 +1,3 @@
-# import pytorch_lightning as pl
 import torch
 import numpy as np
 import pandas as pd
@@ -8,7 +7,6 @@ import random
 from tqdm import tqdm, trange
 from pathlib import Path
 from torch.utils.data import Dataset, DataLoader
-from torch.nn import functional as F
 import torchaudio.transforms as T
 from torchaudio import load
 
@@ -17,32 +15,14 @@ from scipy.optimize import brentq
 from scipy.interpolate import interp1d
 from sklearn.metrics import roc_curve
 
-# from singer_identity.augmentations import aug
 aug = None
-from singer_identity.utils.core import freeze_params
-from singer_identity.trainer import SSLTrainer
 
-# from singer_identity.models.baselines import load_id_extractor
 from singer_identity import load_model
 
-# from singer_identity.model import IdentityEncoder
 
-# def load_id_extractor(**args):
-#     ckpt_path = args["ckpt_path"]
-#     if ckpt_path.endswith(".ckpt"):
-#         trainer = SSLTrainer()
-#         model = trainer.load_from_checkpoint(ckpt_path)
-
-#         freeze_params(model)
-#         model.eval()
-#     elif ckpt_path.endswith(".ts"):
-#         model = torch.jit.load(ckpt_path)
-#         model.eval()
-#         freeze_params(model)
-#         model.eval()
-#     else:
-#         raise ValueError
-#     return model
+def load_id_extractor(model_file, source):
+    """Overwrite load_id_extractor to load your model"""
+    raise NotImplementedError
 
 
 similarity = torch.nn.CosineSimilarity(dim=1, eps=1e-08)
@@ -83,7 +63,7 @@ class EER_Eval_Dataset(Dataset):
 
         self.augs_reverb = {
             "reverb": 0.8,
-            "reverb_path": "/home/bernardo/Projects/Datasets/rirs_noises/RIRS_NOISES/real_rirs_isotropic_noises",
+            "reverb_path": "path_to_RIRs",
         }
 
     def processing(self):
@@ -113,8 +93,6 @@ class EER_Eval_Dataset(Dataset):
 
         x_name = x_path
         nr_samples = 176400  # 4 seconds in 44100 Hz
-        # wav, _ = apply_effects_file(x_path, EFFECTS)
-        # wav =  get_fragment_from_file(x_path, nr_samples, normalize=True, draw_random=True, sr=44100)
         try:
             # Load and normalize audio using torchaudio
             wav, _ = load(x_path)
@@ -206,59 +184,6 @@ class SimilarityEvaluator(torch.nn.Module):
 
         return {"EER": eer, "rank": rank}
 
-    # class SimilarityEvaluator(pl.LightningModule):
-    #     def __init__(
-    #         self,
-    #         model,
-    #         exp_dir,
-    #         exp_name="experiment",
-    #         use_projection=False,
-    #         compute_eer=True,
-    #         compute_rank=False,
-    #         downsample_upsample=False,
-    #     ):
-    #         super().__init__()
-    #         self.model = model
-    #         self.records = {}
-    #         self.exp_dir = exp_dir
-    #         self.exp_name = exp_name
-    #         self.use_projection = use_projection
-    #         self._compute_rank_ = compute_rank
-    #         self._compute_eer_ = compute_eer
-    #         self.downsample_upsample = downsample_upsample
-    #         if self.downsample_upsample:
-    #             self.downsample = T.Resample(44100, 16000)
-    #             self.upsample = T.Resample(16000, 44100)
-
-    #     def forward(self, wav):
-    #         features = self.model.encoder(self.model.feature_extractor(wav))
-    #         if self.use_projection:
-    #             features = self.model.projection(features)
-    #         return features
-
-    #     def test_step(self, batch, batch_idx):
-    #         (wavs, others) = batch
-    #         if self.downsample_upsample:
-    #             wavs = self.downsample(wavs)
-    #             wavs = self.upsample(wavs)
-
-    #         output = self(wavs)  # Compute embeddings
-    #         utt_name = others  # Vector of filepaths
-
-    #         for idx in range(len(output)):  # Save embeddings in self.records
-    #             self.records[utt_name[idx]] = output[idx].cpu().detach()
-    #         return {"output": output, "filepaths": utt_name}
-
-    #     def test_epoch_end(self, outputs):
-    #         rank = None
-    #         if self._compute_rank_:
-    #             rank = self.compute_rank(self.trainer.test_dataloaders[0])
-
-    #         eer = None
-    #         if self._compute_eer_:
-    #             eer = self.compute_eer(self.trainer.test_dataloaders[0])
-    #         return {"EER": eer, "rank": rank}
-
     def compute_rank(self, dataloader):
         trials = dataloader.dataset.pair_table
         speaker_paths = dataloader.dataset.spk_paths
@@ -267,6 +192,8 @@ class SimilarityEvaluator(torch.nn.Module):
         MAX_RANK_EVALS = 1000
 
         # Goes through all pairs in trials but only keeps those that have label 1, saves in new_trials
+        # The trials file is not needed for computing rank, only for computing EER,
+        # but it is used here because we already have it anyway
         new_trials = []
         for i in range(0, len(trials)):
             label, name1, name2 = trials[i]
@@ -276,29 +203,25 @@ class SimilarityEvaluator(torch.nn.Module):
         for i in trange(
             0, MAX_RANK_EVALS, leave=False, desc=f"Rank on {self.exp_name}"
         ):
-            label, name1, name2 = new_trials[i]
+            label, name1, name2 = new_trials[i]  # q1 and q2 in the paper
             # Finds in speaker_paths all paths that have a different speaker than name1
             # Then compute similarity score between name1 and all other speaker files from different speaker names
             # It is assumed that the first string in the path before "/" is the speaker name
-            # This is the case for VoxCeleb1 and VoxCeleb2
-            # Different datasets may have different conventions
             other_speakers = [
                 path for path in speaker_paths if name1.split("/")[-2] not in path
             ]
-            # Choose SAMPLE_SIZE random other speakers
+            # Choose SIMILARITY_BATCH_SIZE random other speakers (S in the paper)
             other_speakers = random.sample(other_speakers, SIMILARITY_BATCH_SIZE)
             other_speakers = [name2] + other_speakers
 
             # Compute similarity between name1 embeddings saved in self.records and all other speaker files
             # from different speaker names
-            # Joins all other_speakers in the batch to a single tensor,
             other_speakers_embeddings = [
                 self.records[path].unsqueeze(0) for path in other_speakers
             ]
             other_speakers_embeddings = torch.cat(other_speakers_embeddings, dim=0).to(
                 device
             )
-            # Repeat name1 embeddings to match the number of other_speakers_embeddings
             name1_embeddings = (
                 self.records[name1].repeat(len(other_speakers_embeddings), 1).to(device)
             )
@@ -306,14 +229,11 @@ class SimilarityEvaluator(torch.nn.Module):
             other_speakers_scores = (
                 similarity(name1_embeddings, other_speakers_embeddings).cpu().numpy()
             )
-            # Find usnig arsort the
             rank = np.argsort(other_speakers_scores)[::-1]
             anchor = np.where(rank == 0)[0][0]
             scores.append(anchor / len(other_speakers_scores))
         mean_rank = np.mean(scores)
-        # self.log("rank", mean_rank)
         return mean_rank
-        #
 
     def compute_eer(self, dataloader):
         mode = "test"
@@ -334,9 +254,7 @@ class SimilarityEvaluator(torch.nn.Module):
             batch_name2_embeddings = []
             for label, name1, name2 in batch:
                 labels.append(label)
-                # Joins all name1 in the batch to a single tensor
                 batch_name1_embeddings.append(self.records[name1])
-                # Joins all name2 in the batch to a single tensor
                 batch_name2_embeddings.append(self.records[name2])
                 pair_names.append(f"{name1.split('/')[-3:]}, {name2.split('/')[-3:]}")
 
@@ -350,9 +268,7 @@ class SimilarityEvaluator(torch.nn.Module):
                 .cpu()
                 .numpy()
             )
-            # Unpacks score tensor into a list
             score = score.tolist()
-            # Adds the scores to the list of all scores
             scores.extend(score)
 
         eer, *others = EER(np.array(labels, dtype=int), np.array(scores))  # eer
@@ -383,9 +299,6 @@ class SimilarityEvaluator(torch.nn.Module):
                 for name, score in zip(pair_names, labels)
             ]
             file.writelines(line)
-
-        # Log EER
-        # self.log("EER", eer)
         return eer
 
 
@@ -494,35 +407,8 @@ if __name__ == "__main__":
     )
 
     args = parser.parse_args()
-    #
-    # Manual set for testing
-    # args.metadata_dir = "/home/bernardo/Projects/ssl-singer-representations/metadata"
-    # args.root = "/home/bernardo/Projects/Datasets/"
-    # # args.data = ["vocalset_renamed_split_4s"]
-    # args.data = [
-    #     "vocalset_renamed_split_4s",
-    #     "vctk_preprocessed_44khz_renamed_split_4s",
-    # ]
-    # args.model = "/home/bernardo/Projects/ssl-singer-representations/pretrained_models/contrastive/best-rank-val-epoch=365-step=53436.ts"
-    # args.model = "/home/bernardo/Projects/ssl-singer-representations/pretrained_models/byol/best-order-val-epoch=365-step=62220.ts"
-    # # args.model = "resemblyzer"
-    # args.source = (
-    #     "/home/bernardo/Projects/ssl-singer-representations/pretrained_models/"
-    # )
-    # args.model = "byol"
-    # args.use_projection = False
-    # args.use_features = True
-    # args.compute_rank = True
-    # args.compute_eer = True
-    # args.reverb = False
-    # args.batch_size = 16
-    # args.downsample_upsample = False
 
     BATCH_SIZE = args.batch_size
-    # The full command to run this script is:
-    #
-
-    # pl.seed_everything(args.seed, workers=True)
 
     def set_seed(seed):
         torch.manual_seed(seed)
@@ -610,19 +496,11 @@ if __name__ == "__main__":
             model = load_model(model_file, source)
         except:
             print(f"Could not load model {model_file} from {source}, trying again")
-            from singer_identity.models.baselines import load_id_extractor
-
             try:
-                model = load_id_extractor(
-                    **{
-                        "ckpt_path": model_file,
-                        "sr": 44100,
-                        "return_tensor": True,
-                        "remove_time_dim": True,
-                    }
-                )
+                model = load_id_extractor(model_file, source)
             except:
                 raise ValueError(f"Could not load model {model_file} from {source}")
+            
         print(f"Model {model_file} loaded successfully")
 
         model.eval()
@@ -636,15 +514,11 @@ if __name__ == "__main__":
                 compute_eer=_compute_eer,
                 downsample_upsample=args.downsample_upsample,
             )
-            .to("cuda")
+            .to("cuda") #  Change to "cpu" if you don't have a GPU, but it will be much slower
             .eval()
         )
-        # test_result = trainer.test(
-        #     wrappped_model, dataloaders=test_loaders[test_dataset], verbose=False
-        # )
-        test_result = evaluator.evaluate(test_loaders[test_dataset])
 
-        # Get models_txt file name without extension
+        test_result = evaluator.evaluate(test_loaders[test_dataset])
 
         if _compute_eer:
             eer_score = test_result["EER"]
@@ -656,8 +530,6 @@ if __name__ == "__main__":
             model_scores[test_dataset] = eer_score
             df = pd.DataFrame.from_dict(model_scores, orient="index")
             # Open existing "eer.csv" file or create a new one and append the new score, do not overwrite
-            # Do not remove data already in the file, only append. However, insert test_dataset header ON THE FIRST LINE
-            # if it does not exist yet
             append_model_scores(
                 experiment_name, model_scores, metadata_dir / f"eer_{args.seed}.csv"
             )
@@ -670,8 +542,6 @@ if __name__ == "__main__":
             rank_scores[test_dataset] = rank
             rank = pd.DataFrame.from_dict(rank_scores, orient="index")
             # Open existing "rank.csv" file or create a new one and append the new score, do not overwrite
-            # Do not remove data already in the file, only append. However, insert test_dataset header ON THE FIRST LINE
-            # if it does not exist yet
             append_model_scores(
                 experiment_name, rank_scores, metadata_dir / f"rank_{args.seed}.csv"
             )
