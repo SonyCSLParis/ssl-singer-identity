@@ -65,7 +65,7 @@ def normalize_signal(signal):
 
 
 def get_fragment_from_file(
-    fn, nr_samples, normalize=False, from_=0, draw_random=False, sr=44100
+    fn, nr_samples, normalize=False, from_=0, draw_random=False, sr=44100, verbose=False
 ):
     sample = None
 
@@ -77,7 +77,8 @@ def get_fragment_from_file(
             from_ = np.random.randint(0, draw_interval_size)
         # assert f.samplerate == 44100, f"sample rate is {f.samplerate}, should be 44100 though."
         if f.samplerate != sr:
-            print(f"Warning: sample rate is {f.samplerate}, configured as {sr}: {fn}")
+            if verbose:
+                print(f"Warning: sample rate is {f.samplerate}, configured as {sr}: {fn}")
         try:
             nr_samples_ = np.minimum(nr_samples, f.frames)
             f.seek(from_)

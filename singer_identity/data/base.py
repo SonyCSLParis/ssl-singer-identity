@@ -217,7 +217,7 @@ class BaseDataModule(pl.LightningDataModule):
         self.prepare_data_end()
 
     def setup(self, stage=None):
-        assert len(self.dataset_dirs) > 0
+        assert len(self.dataset_dirs) > 0, "No dataset directories provided"
         self._process_dataset_dirs()
         self._merge_groups()
         self._perform_train_val_split()

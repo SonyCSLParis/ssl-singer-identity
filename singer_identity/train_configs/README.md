@@ -4,7 +4,7 @@ You can use a configuration file to train a model using the `train.py` script. H
 
 
 ```python
-python train.py --config common.yaml --config model_config.yaml
+python train.py --config path/to/common.yaml --config path/to/model_config.yaml
 ```
 The model specific options are described below. In the example above, `model_config.yaml` will overwrite the options in `common.yaml` when options are repeated. For more details check the [Lightning CLI](https://lightning.ai/docs/pytorch/stable/cli/lightning_cli.html#lightning-cli) docs.
 
