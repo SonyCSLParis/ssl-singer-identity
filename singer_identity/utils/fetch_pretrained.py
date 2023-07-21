@@ -1,10 +1,5 @@
 """Downloads or otherwise fetches pretrained models
- Adapted from https://github.com/speechbrain/speechbrain/blob/f02eafc1e8ac3f094e89a4c31941e44f4dbcab62/speechbrain/pretrained/fetching.py
-
-Authors:
- * Aku Rouhe 2021
- * Samuele Cornell 2021
- * Andreas Nautsch 2022, 2023
+ Almost entirely adapted from https://github.com/speechbrain/speechbrain/blob/f02eafc1e8ac3f094e89a4c31941e44f4dbcab62/speechbrain/pretrained/fetching.py
 
 """
 import urllib.request

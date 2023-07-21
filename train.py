@@ -1,15 +1,11 @@
 import torch
 import pytorch_lightning as pl
 from pytorch_lightning.cli import LightningCLI
+
+# TODO verify that this is really needed
 from singer_identity.trainer import SSLTrainer
 from singer_identity.trainer_byol import BYOL
 from singer_identity.data.siamese_encoders import SiameseEncodersDataModule
-
-# TODO verify that this is really needed
-
-# # Comment this line to run the script without callbacks and avoid possible
-# # visual package import errors
-# from callbacks import *
 
 
 class CLI(LightningCLI):

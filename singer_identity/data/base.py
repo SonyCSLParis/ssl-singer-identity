@@ -62,18 +62,9 @@ class BaseDictDataset(Dataset):
             self.augmentations = augmentations
 
         self.batch_sampling_mode = batch_sampling_mode
-
-        # self.groups_keys = list(self.groups.keys())
-        # self.inv_map = {fn: k for k, v in groups.items() for fn in v}
-        # self.inv_map_keys = list(self.inv_map.keys())
-        # self.inv_map_values = list(self.inv_map.values())
         self.prepare_dataset()
 
-        # if self.batch_sampling_mode == "sample_clips":
-        #     self.data_len = len(self.inv_map)
-        # else:
-        #     self.data_len = len(self.groups)
-
+    
     def prepare_dataset(self):
         """Creates a inverse dictionary mapping filenames to group names"""
         self.groups_keys = list(self.groups.keys())

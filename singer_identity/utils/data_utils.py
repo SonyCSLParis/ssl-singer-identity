@@ -166,6 +166,7 @@ def group_files(root_folder, select_only_groups=None, no_partitions=False):
     return groups
 
 
+# this has the same functionality as group_files, but less pretty
 def prepare_fn_groups_vocal(
     root_folder,
     groups=None,

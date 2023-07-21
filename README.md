@@ -1,22 +1,11 @@
 Singer Identity Representation Learning using Self-Supervised Techniques
 ==============================
 
-This repository contains the code and models of the paper: [Singer Identity Representation Learning using Self-Supervised Techniques](link_to_the_paper). You can find additional visualizations of the singer embeddings and supplementary material [here](https://sites.google.com/view/singer-representation-learning).
+This repository contains the code and models of the paper: [Singer Identity Representation Learning using Self-Supervised Techniques PUT LINK TO THE PAPER](link_to_the_paper). 
+
+You can find additional visualizations of the singer embeddings and supplementary material [here](https://sites.google.com/view/singer-representation-learning).
 
 *Bernardo Torres, Stefan Lattner and Gaël Richard*
-
-TODO 
-- improve these images (or remove them completely)
-- Add Classifier code
- 
-<p float="left">
-  <img src="examples/exp_byol_m4singer_renamed_split_4s_similarity.png.png"
-         alt="BYOL"
-         width="49%" />
-    <img src="examples/exp_byol_m4singer_renamed_split_4s_tsne.png.png"
-            alt="SimCLR"
-            width="40%" />
-</p>
 
 
 ## Training <a name="training"></a>
@@ -94,13 +83,14 @@ model = load_model(model_name)
 This will load the model using HuggingFace Hub.
 You can also use `load_model(model_name, torchscript=True)` to load a [scripted](https://pytorch.org/tutorials/beginner/Intro_to_TorchScript_tutorial.html) version of the model.
 
+If using a sample rate different than 44.1kHz, you can specify it using `input_sr`, eg. `load_model(model_path, input_sr=16000)` (note that this will upsample the audio to 44.1kHz before computing the embeddings, which is not what the model was trained on).
+
+
 To manually specify the model (eg for testing trained/finetuned models), make sure to place the model file in a folder with the corresponding `hyperparams.yaml`: 
 
 ```python 
-load_model(model_filename.pt, source=/path/to/model/folder)
+model = load_model(model_filename.pt, source=/path/to/model/folder)
 ```
-
-If using a sample rate different than 44.1kHz, you can specify it using `input_sr`, eg. `load_model(model_path, input_sr=16000)` (note that this will upsample the audio to 44.1kHz before computing the embeddings, which is not what the model was trained on).
 
 The pretrained models are available on HuggingFace Hub:
 
@@ -198,7 +188,7 @@ Example:
 python eval.py -s 123 -r /data/datasets -d vocalset -m byol_model -meta test_scores/metadata -f True -cr True -ce True -bs 128
 ```
 
-If you want to evaluate your own models simply override the `load_id_extractor(model_file, source)` method of the `eval.py`.
+**If you want to evaluate your own models** simply override the `load_id_extractor(model_file, source)` method `eval.py`.
 
 #### Singer identification evaluation <a name="evaluation"></a>
 

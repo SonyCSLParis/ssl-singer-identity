@@ -61,7 +61,7 @@ class SiameseEncodersDataModule(BaseDataModule):
         return DataLoader(
             SiameseEncodersDataset(
                 self.groups_train,
-                nr_samples=self.nr_samples,  # For 4s, nr_samples is sr*4
+                nr_samples=self.nr_samples,  
                 normalize=self.normalize,
                 augmentations=self.augmentations,
                 transform_override=self.transform_override,
@@ -79,7 +79,7 @@ class SiameseEncodersDataModule(BaseDataModule):
         return DataLoader(
             SiameseEncodersDataset(
                 self.groups_eval,
-                nr_samples=self.nr_samples,  # For 4s, nr_samples is sr*4
+                nr_samples=self.nr_samples,  
                 normalize=self.normalize,
                 augmentations={},  # No augmentations for validation
                 batch_sampling_mode=self.batch_sampling_mode,
