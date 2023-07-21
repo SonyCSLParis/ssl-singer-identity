@@ -41,6 +41,8 @@ class BYOL(TeacherStudentModel):
         x1 = batch["clip1"]
         x2 = batch["clip2"]
 
+        batch_size = x1.shape[0]
+
         ys, zs, qs = self.student_network(x1)
         with torch.no_grad():
             yt, zt, qt = self.teacher_network(x2)
@@ -57,6 +59,7 @@ class BYOL(TeacherStudentModel):
             f"loss/{step_name}",
             loss,
             prog_bar=True,
+            batch_size=batch_size,
         )
 
         self.record_variables(y1=ys, z1=zs, y2=yt, z2=zt)
