@@ -28,6 +28,10 @@ def load_id_extractor(model_file, source):
 similarity = torch.nn.CosineSimilarity(dim=1, eps=1e-08)
 
 
+SIMILARITY_BATCH_SIZE = 512
+NUM_WORKERS = 0
+
+
 def EER(labels, scores):
     """
     labels: (N,1) value: 0,1
@@ -120,7 +124,6 @@ class EER_Eval_Dataset(Dataset):
             )
             wav = torch.zeros(nr_samples)
 
-        # return wav.numpy(), x_name
         return wav, x_name
 
 
@@ -301,9 +304,6 @@ class SimilarityEvaluator(torch.nn.Module):
             file.writelines(line)
         return eer
 
-
-SIMILARITY_BATCH_SIZE = 512
-NUM_WORKERS = 0
 
 
 def append_model_scores(model_name, model_scores, csv_file):

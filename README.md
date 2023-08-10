@@ -8,11 +8,50 @@ You can find additional visualizations of the singer embeddings and supplementar
 *Bernardo Torres, Stefan Lattner and Gaël Richard*
 
 
+## Pretrained Models <a name="pretrained-models"></a>
+
+You can download and load the pretrained models using the following command:
+
+```python
+from singer_identity import load_model
+model = load_model(model_name)
+```
+This will load the model using HuggingFace Hub.
+You can also use `load_model(model_name, torchscript=True)` to load a [scripted](https://pytorch.org/tutorials/beginner/Intro_to_TorchScript_tutorial.html) version of the model.
+
+If using a sample rate different than 44.1kHz, you can specify it using `input_sr`, eg. `load_model(model_path, input_sr=16000)` (note that this will upsample the audio to 44.1kHz before computing the embeddings, which is not what the model was trained on).
+
+
+To manually specify the model (eg for testing trained/finetuned models), make sure to place the model file in a folder with the corresponding `hyperparams.yaml`: 
+
+```python 
+model = load_model(model_filename.pt, source=/path/to/model/folder)
+```
+
+The pretrained models are available on HuggingFace Hub:
+
+- `byol`: trained with BYOL
+- `contrastive`: trained with the decoupled contrastive loss
+- `contrastive-vc`: trained with the decoupled contrastive loss + variance and covariance regularizations
+- `uniformity`: trained with the uniformity loss
+- `vicreg`: trained with the vicreg loss
+
+Example:
+
+```python
+from singer_identity import load_model
+model = load_model('byol')
+
+audio_batch = ...  # Get audio from somewhere (here in 44.1 kHz), shape: (batch_size, n_samples)
+embeddings = model(audio_batch)  # shape: (batch_size, 1000)
+```
+
+
 ## Training <a name="training"></a>
 
 We provide the code to train a simple model on the following SSL tasks: 
 
-- Contrastive Learning [1,2]
+- Contrastive Learning (SimCLR, COLA) [1,2]
 - Uniformity-Alignment [3]
 - VICReg [4]
 - BYOL [5]
@@ -72,47 +111,9 @@ Replace `class_path` field in the config file to use different a different logge
 
 You can use the provided `environment.yml` file to create a conda environment with the required dependencies.
 
-## Pretrained Models <a name="pretrained-models"></a>
-
-You can download and load the pretrained models using the following command:
-
-```python
-from singer_identity import load_model
-model = load_model(model_name)
-```
-This will load the model using HuggingFace Hub.
-You can also use `load_model(model_name, torchscript=True)` to load a [scripted](https://pytorch.org/tutorials/beginner/Intro_to_TorchScript_tutorial.html) version of the model.
-
-If using a sample rate different than 44.1kHz, you can specify it using `input_sr`, eg. `load_model(model_path, input_sr=16000)` (note that this will upsample the audio to 44.1kHz before computing the embeddings, which is not what the model was trained on).
-
-
-To manually specify the model (eg for testing trained/finetuned models), make sure to place the model file in a folder with the corresponding `hyperparams.yaml`: 
-
-```python 
-model = load_model(model_filename.pt, source=/path/to/model/folder)
-```
-
-The pretrained models are available on HuggingFace Hub:
-
-- `byol`: trained with BYOL
-- `contrastive`: trained with the decoupled contrastive loss
-- `contrastive-vc`: trained with the decoupled contrastive loss + variance and covariance regularizations
-- `uniformity`: trained with the uniformity loss
-- `vicreg`: trained with the vicreg loss
-
-Example:
-
-```python
-from singer_identity import load_model
-model = load_model('byol')
-
-audio_batch = ...  # Get audio from somewhere (here in 44.1 kHz), shape: (batch_size, n_samples)
-embeddings = model(audio_batch)  # shape: (batch_size, 1000)
-```
-
 ## Evaluation <a name="data-preprocessing"></a>
 #### Data Preparation <a name="data-preprocessing"></a>
-Steps to preprocess the data for evaluation:
+The following steps prepare the data for evaluation as it was used in the paper. It crops the audio files in non-overlaping segments n seconds and copies them to a flattened structure.
 
 1. Make sure the dataset is in the following structure:
 

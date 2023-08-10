@@ -7,7 +7,6 @@ import torchaudio.transforms as T
 from nnAudio import features
 import warnings
 
-
 from singer_identity.utils.fetch_pretrained import from_hparams, from_scripted
 from singer_identity.models.network_components import (
     get_vision_backbone,
@@ -90,7 +89,6 @@ class Encoder(nn.Module):
 
 class Projection(nn.Module):
     """Projection head, used to reduce the dimensionality of the embedding"""
-
     def __init__(
         self,
         input_dim=1000,
@@ -127,7 +125,6 @@ class IdentityEncoder(nn.Module):
     def __init__(self, feature_extractor, encoder):
         super().__init__()
         self.feature_extractor = FeatureExtractor(**feature_extractor)
-
         self.encoder = Encoder(**encoder)
 
     def forward(self, x):
@@ -136,7 +133,6 @@ class IdentityEncoder(nn.Module):
 
 class SiameseArm(nn.Module):
     """For BYOL"""
-
     def __init__(
         self,
         encoder: nn.Module,
@@ -175,7 +171,6 @@ class EncoderWrapper(nn.Module):
     Feature extractor can be used to resample signals on-the-fly
         (eg. when a model accepts 16 kHz input).
     """
-
     def __init__(self, encoder, feature_dim=256, input_sr=44100, output_sr=16000):
         super().__init__()
         self.encoder = encoder
@@ -327,7 +322,7 @@ def load_model(
             raise Exception("Torchscript models only support 44100 Hz input")
         model = from_scripted(f"{model}/model.ts", source, savedir=savedir)
     elif "." in model:
-        # Instanciate IdentityEncoder with input_sr argument
+        # Instantiate IdentityEncoder with input_sr argument
         model = from_hparams(
             IdentityEncoder,
             source,
