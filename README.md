@@ -57,6 +57,11 @@ We provide the code to train a simple model on the following SSL tasks:
 - BYOL [5]
 
 
+<p align="center">
+<img src="metadata/img/pipeline.png" width="600">
+</p>
+
+
 The default backbone is the EfficientNet-B0 [6], with average pooling as temporal aggregation. 
 
 Our training script uses [PyTorch Lightning](https://www.pytorchlightning.ai/) and [Lightning CLI](https://lightning.ai/docs/pytorch/stable/cli/lightning_cli.html#lightning-cli). To train a model, use the `train.py` script as follows:
