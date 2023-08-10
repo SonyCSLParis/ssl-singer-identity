@@ -58,7 +58,7 @@ We provide the code to train a simple model on the following SSL tasks:
 
 
 <p align="center">
-<img src="metadata/img/pipeline.png" width="600">
+<img src="metadata/img/pipeline.png" width="1000">
 </p>
 
 
