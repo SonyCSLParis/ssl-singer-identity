@@ -66,7 +66,7 @@ And additionally:
 - BYOL [5]
 
 <p align="center">
-<img src="metadata/img/Byol.png" width="600">
+<img src="metadata/img/byol.png" width="600">
 </p>
 
 The default backbone is the EfficientNet-B0 [6], with average pooling as temporal aggregation. 
