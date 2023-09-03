@@ -222,7 +222,7 @@ The model was tested with the following out of domain datasets:
 
 ## Citation <a name="citation"></a>
 
-If you find this work useful for your research, please cite our paper:
+If you find this work useful for your research, please cite the paper:
 
 ```
 @inproceedings{torres2023singer,
