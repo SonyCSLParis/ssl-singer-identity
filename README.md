@@ -1,7 +1,7 @@
 Singer Identity Representation Learning using Self-Supervised Techniques
 ==============================
 
-This repository contains the code and models of the paper: [Singer Identity Representation Learning using Self-Supervised Techniques PUT LINK TO THE PAPER](link_to_the_paper). 
+This repository contains the code and models of the paper: [Singer Identity Representation Learning using Self-Supervised Techniques](https://hal.science/hal-04186048v1). 
 
 You can find additional visualizations of the singer embeddings and supplementary material [here](https://sites.google.com/view/singer-representation-learning).
 
@@ -57,15 +57,15 @@ We provide the code to train a simple model on the following SSL tasks:
 
 
 
-<p align="center">
-<img src="metadata/img/pipeline.png" width="1000">
+<p align="left">
+<img src="metadata/img/pipeline.png" width="900">
 </p>
 
 And additionally:
 
 - BYOL [5]
 
-<p align="center">
+<p align="left">
 <img src="metadata/img/byol.png" width="600">
 </p>
 
@@ -222,10 +222,15 @@ The model was tested with the following out of domain datasets:
 
 ## Citation <a name="citation"></a>
 
-If you find this code useful for your research, please cite our paper:
+If you find this work useful for your research, please cite the paper:
 
 ```
-TODO ADD REFERENCE
+@inproceedings{torres2023singer,
+  title={Singer Identity Representation Learning using Self-Supervised Techniques},
+  author={Torres, Bernardo and Lattner, Stefan and Richard, Gael},
+  booktitle={International Society for Music Information Retrieval Conference (ISMIR 2023)},
+  year={2023}
+}
 ```
 ## References <a name="references"></a>
 
