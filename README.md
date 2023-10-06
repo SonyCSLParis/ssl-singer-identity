@@ -15,6 +15,7 @@ You can download and load the pretrained models using the following command:
 ```python
 from singer_identity import load_model
 model = load_model(model_name)
+model.eval()
 ```
 This will load the model using HuggingFace Hub.
 You can also use `load_model(model_name, torchscript=True)` to load a [scripted](https://pytorch.org/tutorials/beginner/Intro_to_TorchScript_tutorial.html) version of the model.
