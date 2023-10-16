@@ -66,7 +66,7 @@ We provide the code to train a simple model on the following SSL tasks:
 
 
 <p align="center">
-<img src="metadata/img/techniques.png" width="450">
+<img src="metadata/img/techniques_.png" width="450">
 </p>
 
 The default backbone is the EfficientNet-B0 [6], with average pooling as temporal aggregation. 
