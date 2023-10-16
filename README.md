@@ -55,19 +55,18 @@ We provide the code to train a simple model on the following SSL tasks:
 - Contrastive Learning (SimCLR, COLA) [1,2]
 - Uniformity-Alignment [3]
 - VICReg [4]
-
-
-
-<p align="left">
-<img src="metadata/img/pipeline.png" width="900">
-</p>
-
-And additionally:
-
 - BYOL [5]
 
+
+
 <p align="left">
-<img src="metadata/img/byol.png" width="600">
+<img src="metadata/img/full_diagram.png" width="900">
+</p>
+
+
+
+<p align="left">
+<img src="metadata/img/techniques.png" width="600">
 </p>
 
 The default backbone is the EfficientNet-B0 [6], with average pooling as temporal aggregation. 
