@@ -42,6 +42,7 @@ Example:
 ```python
 from singer_identity import load_model
 model = load_model('byol')
+model.eval()
 
 audio_batch = ...  # Get audio from somewhere (here in 44.1 kHz), shape: (batch_size, n_samples)
 embeddings = model(audio_batch)  # shape: (batch_size, 1000)
