@@ -5,16 +5,17 @@ import torch.nn as nn
 from singer_identity.models.byol import TeacherStudentModel, Optimizer, Scheduler
 from singer_identity.model import IdentityEncoder, Projection, SiameseArm, MLP
 
+import copy
 
 class BYOL(TeacherStudentModel):
     def __init__(
         self,
         # module: nn.Module,
-        backbone: dict,
-        projection: dict,
-        predictor: dict,
         weight_callback,
         optimizer: Optimizer,
+        backbone: dict = {},
+        projection: dict  = {},
+        predictor: dict = {},
         feature_extractor: dict = {},
         loss_fn: nn.Module = torch.nn.MSELoss(),
         scheduler: Optional[Scheduler] = None,
@@ -22,12 +23,12 @@ class BYOL(TeacherStudentModel):
         normalize_representations: bool = False,
     ):
         encoder = IdentityEncoder(feature_extractor=feature_extractor, encoder=backbone)
-        projection = Projection(**projection)
-        predictor = MLP(**predictor)
+        projection_layer = Projection(**projection)
+        predictor_layer = MLP(**copy.deepcopy(predictor))
         module = SiameseArm(
             encoder=encoder,
-            projector=projection,
-            predictor=predictor,
+            projector=projection_layer,
+            predictor=predictor_layer,
             normalize_projections=normalize_projections,
             normalize_representations=normalize_representations,
         )
