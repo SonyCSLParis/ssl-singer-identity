@@ -20,7 +20,7 @@ model.eval()
 This will load the model using HuggingFace Hub.
 You can also use `load_model(model_name, torchscript=True)` to load a [scripted](https://pytorch.org/tutorials/beginner/Intro_to_TorchScript_tutorial.html) version of the model.
 
-If using a sample rate different than 44.1kHz, you can specify it using `input_sr`, eg. `load_model(model_path, input_sr=16000)` (note that this will upsample the audio to 44.1kHz before computing the embeddings, which is not what the model was trained on).
+If using a sample rate different than 44.1kHz, you can specify it using `input_sr`, eg. `load_model(model_path, input_sr=16000)`. This will upsample the audio to 44.1kHz before computing the embeddings. Please note that the model was trained on full band signals, so a difference in performance can be expected.
 
 The pretrained models are available on HuggingFace Hub:
 
@@ -39,18 +39,6 @@ model.eval()
 
 audio_batch = ...  # Get audio from somewhere (here in 44.1 kHz), shape: (batch_size, n_samples)
 embeddings = model(audio_batch)  # shape: (batch_size, 1000)
-```
-
-To manually specify the model (eg for testing trained/finetuned models), make sure to place the model file `model.pt` in a folder `model_folder` with the corresponding `hyperparams.yaml`: 
-
-```python 
-model = load_model(model_folder, source=/path/to/model/folder)
-```
-
-To convert from a Pytorch Lightning checkpoint to a Identity Encoder `model.pt`, use the `convert_checkpoint.py` script:
-
-```bash
-python convert_checkpoint.py --checkpoint /path/to/checkpoint.ckpt --config /path/to/config.yaml --output_dir /path/to/output_dir
 ```
 
 ## Training <a name="training"></a>
@@ -82,6 +70,21 @@ Our training script uses [PyTorch Lightning](https://www.pytorchlightning.ai/) a
 python train.py --config common.yaml --config model_config.yaml
 ```
 See the [config](singer_identity/train_configs/README.md) folder for details on the configuration file for each SSL training.  
+
+
+### Loading trained models
+
+To manually specify the model (eg for testing trained/finetuned models), make sure to place the model file `model.pt` in a folder `model_folder` with the corresponding `hyperparams.yaml`: 
+
+```python 
+model = load_model(model_folder, source=/path/to/model/folder)
+```
+
+To convert from a Pytorch Lightning checkpoint to a Identity Encoder `model.pt`, use the `convert_checkpoint.py` script:
+
+```bash
+python convert_checkpoint.py --checkpoint /path/to/checkpoint.ckpt --config /path/to/config.yaml --output_dir /path/to/output_dir
+```
 
 
 ### Data Preparation
