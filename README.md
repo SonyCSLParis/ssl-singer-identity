@@ -78,6 +78,7 @@ To load a model from a local path (eg for testing trained/finetuned models), mak
 
 ```python 
 model = load_model(model_folder, source=/path/to/model/folder)
+model.eval()
 ```
 
 To convert from a Pytorch Lightning checkpoint to an Identity Encoder `model.pt`, use the `convert_checkpoint.py` script:
