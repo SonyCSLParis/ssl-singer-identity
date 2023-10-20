@@ -74,13 +74,13 @@ See the [config](singer_identity/train_configs/README.md) folder for details on 
 
 ### Loading trained models
 
-To manually specify the model (eg for testing trained/finetuned models), make sure to place the model file `model.pt` in a folder `model_folder` with the corresponding `hyperparams.yaml`: 
+To load a model from a local path (eg for testing trained/finetuned models), make sure to place the model file `model.pt` in a folder `model_folder` with the corresponding `hyperparams.yaml`: 
 
 ```python 
 model = load_model(model_folder, source=/path/to/model/folder)
 ```
 
-To convert from a Pytorch Lightning checkpoint to a Identity Encoder `model.pt`, use the `convert_checkpoint.py` script:
+To convert from a Pytorch Lightning checkpoint to an Identity Encoder `model.pt`, use the `convert_checkpoint.py` script:
 
 ```bash
 python convert_checkpoint.py --checkpoint /path/to/checkpoint.ckpt --config /path/to/config.yaml --output_dir /path/to/output_dir
