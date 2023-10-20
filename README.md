@@ -22,13 +22,6 @@ You can also use `load_model(model_name, torchscript=True)` to load a [scripted]
 
 If using a sample rate different than 44.1kHz, you can specify it using `input_sr`, eg. `load_model(model_path, input_sr=16000)` (note that this will upsample the audio to 44.1kHz before computing the embeddings, which is not what the model was trained on).
 
-
-To manually specify the model (eg for testing trained/finetuned models), make sure to place the model file in a folder with the corresponding `hyperparams.yaml`: 
-
-```python 
-model = load_model(model_filename.pt, source=/path/to/model/folder)
-```
-
 The pretrained models are available on HuggingFace Hub:
 
 - `byol`: trained with BYOL
@@ -48,6 +41,17 @@ audio_batch = ...  # Get audio from somewhere (here in 44.1 kHz), shape: (batch_
 embeddings = model(audio_batch)  # shape: (batch_size, 1000)
 ```
 
+To manually specify the model (eg for testing trained/finetuned models), make sure to place the model file `model.pt` in a folder `model_folder` with the corresponding `hyperparams.yaml`: 
+
+```python 
+model = load_model(model_folder, source=/path/to/model/folder)
+```
+
+To convert from a Pytorch Lightning checkpoint to a Identity Encoder `model.pt`, use the `convert_checkpoint.py` script:
+
+```bash
+python convert_checkpoint.py --checkpoint /path/to/checkpoint.ckpt --config /path/to/config.yaml --output_dir /path/to/output_dir
+```
 
 ## Training <a name="training"></a>
 
