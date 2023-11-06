@@ -185,7 +185,7 @@ python create_speaker_pairs.py -r /path/to/dataset -o /where/sample_pairs/will/b
  First, computing speaker trial pairs is needed (see above). They are stored in a metadata folder, (eg. metadata/vocalset/speaker_pairs.txt, metadata/vctk/speaker_pairs.txt). The EER computation follows the one available on [SUPERB](https://github.com/s3prl/s3prl/tree/main/s3prl). 
 
 ```bash
-python eval.py -s seed -r root -d data -m model -meta metadata -f use_features -cr compute_rank -ce compute_eer -bs batch_size
+python eval.py -s seed -r root -d data -m model -meta metadata -f -cr -ce -bs batch_size
 ```
 
 The arguments are:

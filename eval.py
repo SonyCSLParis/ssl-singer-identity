@@ -17,7 +17,7 @@ from sklearn.metrics import roc_curve
 
 aug = None
 
-from singer_identity import load_model
+from singer_identity import load_model, HF_SOURCE
 
 
 def load_id_extractor(model_file, source):
@@ -358,7 +358,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "-so",
         "--source",
-        default="pretrained_models/",
+        default=HF_SOURCE,
         type=str,
         help="path to local dir where models are saved or huggingface model space",
     )
@@ -372,7 +372,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "-f",
         "--use_features",
-        default=False,
+        default=True,
         action="store_true",
         help="wehter to compute scores using the encoder feature embeddings",
     )
